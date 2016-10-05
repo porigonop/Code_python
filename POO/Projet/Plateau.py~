@@ -1,0 +1,28 @@
+#!/usr/bin/env python3
+from Moteur import Moteur
+class Plateau:
+    def __init__(self, max_x, max_y):
+        """constructeur du plateau, demande les maximum ou i peux se 
+        déplacer
+        """
+        self.moteur_x = Moteur(0, max_x)
+        self.moteur_y = Moteur(0, max_y)
+
+    def deplace_x(x):
+        x_init = self.moteur_x.position()
+        if x_init < x:
+            if self.moteur_x.direction():
+                self.moteur_x.avance(x - x_init)
+            else:
+                self.moteur_x.change_direction()
+                self.moteur_x.avance(x - x_init)
+        else:
+            if not self.moteur_x.direction():
+                self.moteur_x.avance(x_init - x)
+                
+                
+        
+    def aller_a(self, x, y):
+        x_init = self.moteur_x.position()
+        y_init = self.moteur_y.porition()
+                             

@@ -1,0 +1,13 @@
+#!/usr/bin/env python3
+def somme(v):
+    if len(v) == 1:
+        return v
+    v[1] = v[0] + v[1]
+    v.pop(0)
+    return somme(v)
+
+def moyenne(v):
+    pass
+
+a = [3, 1, 5, 2, 4]
+print(somme(a))

@@ -1,0 +1,28 @@
+#!/usr/bin/env python3
+from Plateau import Plateau
+from Moteur import Moteur
+class Structure:
+    def __init__(self, x_max, y_max, z_max):
+        """constructeur de la structure, permet de crée le plateau et 
+        le moteur qui monte.
+        """
+        self.plateau = Plateau(x_max, y_max)
+        self.moteur_z = Moteur(0, z_max)
+    def __repr__(self):
+        return "\n\nhauteur : " +str(self.moteur_z.pos)+\
+            str(self.plateau)
+
+    def positionner(self, x, y, z):
+        if not self.moteur_z.bouge_en(z):
+            print("déplacement impossible en z")
+        self.plateau.aller_a(x, y)
+
+    def recharger(self):
+        self.positionner(0, 0, self.moteur_z.pos)
+        self.positionner(0, 0, 0)
+        
+if __name__ == "__main__":
+    structure = Structure(100, 100, 100)
+    print(structure)
+    structure.positionner(10,20,30)
+    print(structure)
