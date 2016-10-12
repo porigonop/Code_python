@@ -17,6 +17,12 @@ class Complex:
 		if self.Im < 0:
 			return str(self.Re) + str(self.Im) + "i"
 		return str(self.Re) + "+" + str(self.Im) + "i"
+	def __repr__(self):
+		""" allow the user to print the complex number
+		"""
+		if self.Im < 0:
+			return str(self.Re) + str(self.Im) + "i"
+		return str(self.Re) + "+" + str(self.Im) + "i"
 		
 	def multiplicate_by(self, number):
 		"""allow the multiplication

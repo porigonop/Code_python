@@ -1,0 +1,37 @@
+#!/usr/bin/env python3
+from Graph import *
+graph_guido_van_russo = Graph()
+graph_guido_van_russo.add_a_node('A')
+graph_guido_van_russo.add_a_node('B')
+graph_guido_van_russo.add_a_node('C')
+graph_guido_van_russo.add_a_node('D')
+graph_guido_van_russo.add_a_node('E')
+graph_guido_van_russo.add_a_node('F')
+
+graph_guido_van_russo.add_an_edge('A','B')
+graph_guido_van_russo.add_an_edge('A','C')
+graph_guido_van_russo.add_an_edge('B','D')
+graph_guido_van_russo.add_an_edge('B','C')
+graph_guido_van_russo.add_an_edge('C','D')
+graph_guido_van_russo.add_an_edge('D','C')
+graph_guido_van_russo.add_an_edge('F','C')
+graph_guido_van_russo.add_an_edge('E','F')
+
+graph_euler = Graph()
+graph_euler.add_a_node('A')
+graph_euler.add_a_node('B')
+graph_euler.add_a_node('C')
+graph_euler.add_a_node('D')
+
+graph_euler.add_an_edge('A', 'B')
+graph_euler.add_an_edge('B', 'A')
+graph_euler.add_an_edge('A', 'C')
+graph_euler.add_an_edge('C', 'A')
+graph_euler.add_an_edge('A', 'D')
+graph_euler.add_an_edge('D', 'B')
+graph_euler.add_an_edge('D', 'C')
+
+print("============Graph 1=============") 
+print(graph_guido_van_russo)
+print("============Graph 2=============") 
+print(graph_euler)
