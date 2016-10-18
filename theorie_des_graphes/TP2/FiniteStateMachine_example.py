@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from TP import FiniteStateMachine
+from FiniteStateMachine import FiniteStateMachine
 from Text import Text
 
 def create_finite_state_machine_1():
@@ -106,8 +106,8 @@ def create_finite_state_machine(motive):
 								temp = False
 						if temp:	
 							machine.add_a_transition(liste[-pos], \
-																				node, \
-																				equal + letter)
+															node, \
+															equal + letter)
 	
 	# create the return transition, like mam -= m-> m or m-= m-> m
 	edges = list(machine.edges)
@@ -125,12 +125,11 @@ def create_finite_state_machine(motive):
 						
 					
 	return machine
-
 #note : we can't search a motive with one or less character
 texte = input("text :")
 motive = input("motive :")
 replacement = input("replacement :")
-machine = create_finite_state_machine_2()
+machine = create_finite_state_machine(motive)
 text = Text(texte, motive, replacement, machine)
 text.replace()
 print(text.text)

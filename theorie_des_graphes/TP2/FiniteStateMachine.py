@@ -67,8 +67,6 @@ class FiniteStateMachine(Graph):
 						self.position = edge[1]
 						if self.position == self.final:
 							self.position = self.initial
-							
-							
 							return True
 							
 						else:
