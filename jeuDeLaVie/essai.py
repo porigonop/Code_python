@@ -172,7 +172,10 @@ permet de savoir quand l'utilisateur appui sur la souris à une position
         x1 = ( x // 5 )
         y1 = ( y // 5 )
         if pinceau == 1:
-            vivante[y1][x1] = True
+            try:
+                vivante[y1][x1] = True
+            except:
+                pass
         else:
             vivante[y1][x1] = False
         fenetre.setMouseTracking(True)
@@ -185,9 +188,15 @@ enregistre le deplacement de la souris.
         x1 = ( x // 5 )
         y1 = ( y // 5 )
         if pinceau == 1:
-            vivante[y1][x1] = True
+            try:
+                vivante[y1][x1] = True
+            except:
+                pass
         else:
-            vivante[y1][x1] = False
+            try:
+                vivante[y1][x1] = False
+            except:
+                pass
         fenetre.repaint()
     def mouseReleaseEvent(self, QMouseEvent):
         """
