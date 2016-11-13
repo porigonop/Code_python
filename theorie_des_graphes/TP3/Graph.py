@@ -67,18 +67,48 @@ class Graph:
             colors[node] = "white"
             
         parents = {}
-        to_compute = []
+        fifo = []
         for node in self.node:
             if colors[node] != "white":
                 continue
             colors[node] = "grey"
             parents[node] = None
-            to_compute.append(node)
+            fifo.append(node)
             
-            while to_compute != []:
-                in_progress = to_compute[-1]
-                to_compute.pop()
+            while fifo != []:
+                in_progress = fifo[0]
+                fifo.pop(0)
                 for neighbour in adjency_list[in_progress]:
-                    if True:
-                        pass
-                    
+                    if colors[neighbour] == "white":
+                        parents[neighbour] = in_progress
+                        colors[neighbour] = "grey"
+                        fifo.append(neighbour)
+                colors[in_progress] = "black"
+        return parents
+    
+    def depth_first_search(self, departure):
+        colors = {}
+        for node in self.nodes:
+            colors[node] = "white"
+            
+        parents = {}
+        lifo = []
+        for node in self.node:
+            if colors[node] != "white":
+                continue
+            colors[node] = "grey"
+            parents[node] = None
+            lifo.append(node)
+            
+            while fifo != []:
+                in_progress = fifo[-1]
+                lifo.pop()
+                for neighbour in adjency_list[in_progress]:
+                    if colors[neighbour] == "white":
+                        parents[neighbour] = in_progress
+                        colors[neighbour] = "grey"
+                        lifo.append(neighbour)
+                colors[in_progress] = "black"
+        return parents
+        
+        
