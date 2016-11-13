@@ -50,14 +50,14 @@ class Graph:
             edges += edge[0] + "---->" + edge[1] + "\n"
         
         return \
-        "*************************\n\
-        *  Display of the graph *\n\
-        *************************\n\
-        Nodes :\n\
-        ------------\n" +\
+        "*************************\n"\
+        "*  Display of the graph *\n"\
+        "*************************\n"\
+        "Nodes :\n"\
+        "------------\n" +\
         nodes[:len(nodes)-1] +"\n"+\
-        "Edges :\n\
-        ------------\n"+\
+        "Edges :\n"\
+        "------------\n"+\
         edges +"\n" +\
         "=========================\n"
 
@@ -68,22 +68,30 @@ class Graph:
             
         parents = {}
         fifo = []
-        for node in self.node:
+        fifo.append(departure)
+        colors[departure] = "grey"
+        parents[departure] = None
+        
+        for node in sorted(self.nodes):
+
+            while fifo != []:
+                in_progress = fifo[0]
+                fifo.pop(0)
+                for neighbour in self.adjency_list[in_progress]:
+                    if colors[neighbour] == "white":
+                        parents[neighbour] = in_progress
+                        colors[neighbour] = "grey"
+                        fifo.append(neighbour)
+                colors[in_progress] = "black"
+                #do here what you want for the node in_progress
+                
+            
             if colors[node] != "white":
                 continue
             colors[node] = "grey"
             parents[node] = None
             fifo.append(node)
             
-            while fifo != []:
-                in_progress = fifo[0]
-                fifo.pop(0)
-                for neighbour in adjency_list[in_progress]:
-                    if colors[neighbour] == "white":
-                        parents[neighbour] = in_progress
-                        colors[neighbour] = "grey"
-                        fifo.append(neighbour)
-                colors[in_progress] = "black"
         return parents
     
     def depth_first_search(self, departure):
@@ -93,22 +101,57 @@ class Graph:
             
         parents = {}
         lifo = []
-        for node in self.node:
+        lifo.append(departure)
+        colors[departure] = "grey"
+        parents[departure] = None
+        
+        for node in sorted(self.nodes):
+
+            while lifo != []:
+                in_progress = lifo[-1]
+                lifo.pop()
+                for neighbour in self.adjency_list[in_progress]:
+                    if colors[neighbour] == "white":
+                        parents[neighbour] = in_progress
+                        colors[neighbour] = "grey"
+                        lifo.append(neighbour)
+                colors[in_progress] = "black"
+                #do here what you want for the node in_progress
+                print(in_progress)
+            
             if colors[node] != "white":
                 continue
             colors[node] = "grey"
             parents[node] = None
             lifo.append(node)
             
-            while fifo != []:
-                in_progress = fifo[-1]
-                lifo.pop()
-                for neighbour in adjency_list[in_progress]:
-                    if colors[neighbour] == "white":
-                        parents[neighbour] = in_progress
-                        colors[neighbour] = "grey"
-                        lifo.append(neighbour)
-                colors[in_progress] = "black"
         return parents
         
-        
+if __name__ == "__main__":
+    graph = Graph()
+    
+    graph.add_a_node("a")
+    graph.add_a_node("b")
+    graph.add_a_node("c")
+    graph.add_a_node("d")
+    graph.add_a_node("e")
+    graph.add_a_node("f")
+    graph.add_a_node("g")
+    graph.add_a_node("h")
+    
+    graph.add_an_edge("a", "b")
+    graph.add_an_edge("a", "e")
+    graph.add_an_edge("b", "c")
+    graph.add_an_edge("b", "d")
+    graph.add_an_edge("c", "a")
+    graph.add_an_edge("d", "c")
+    graph.add_an_edge("d", "e")
+    graph.add_an_edge("f", "e")
+    graph.add_an_edge("g", "d")
+    graph.add_an_edge("g", "f")
+    graph.add_an_edge("g", "h")
+    graph.add_an_edge("h", "f")
+    
+    print(graph)
+    print(graph.depth_first_search("a"))
+    
