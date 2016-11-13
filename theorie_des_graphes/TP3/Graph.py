@@ -96,6 +96,7 @@ class Graph:
     
     def depth_first_search(self, departure):
         colors = {}
+
         for node in self.nodes:
             colors[node] = "white"
             
@@ -117,7 +118,6 @@ class Graph:
                         lifo.append(neighbour)
                 colors[in_progress] = "black"
                 #do here what you want for the node in_progress
-                print(in_progress)
             
             if colors[node] != "white":
                 continue
@@ -127,31 +127,79 @@ class Graph:
             
         return parents
         
+    def is_bipartite(self):
+        parents = self.depth_first_search(sorted(list(self.nodes))[0])
+        
+        
+        colors = {}
+        for key in sorted(list(parents)):
+            
+            if parents[key] == None:
+                continue
+                
+            if  key in colors and \
+                parents[key] in colors and\
+                colors[key] != colors[parents[key]]:
+                return False
+                
+            if key in colors:
+                colors[parents[key]] = - colors[key]
+                continue
+                
+            if parents[key] in colors:
+                colors[key] = - colors[parents[key]]
+                continue
+            
+            
+
+            colors[key] = 1
+            colors[parents[key]] = -1
+        
+        
+        for edge in self.edges:
+            from_node, to_node = edge
+            if colors[from_node] == colors[to_node]:
+                return False
+        return True
+    
+    
+    
 if __name__ == "__main__":
     graph = Graph()
+    graph2 = Graph()
+    graph3 = Graph()
+    for i in range(ord("a"), ord("d")):
+        graph3.add_a_node(chr(i))
     
-    graph.add_a_node("a")
-    graph.add_a_node("b")
-    graph.add_a_node("c")
-    graph.add_a_node("d")
-    graph.add_a_node("e")
-    graph.add_a_node("f")
-    graph.add_a_node("g")
-    graph.add_a_node("h")
-    
+    for i in range(ord("a"), ord("i")):
+        graph.add_a_node(chr(i))
+        graph2.add_a_node(chr(i))
+        
     graph.add_an_edge("a", "b")
-    graph.add_an_edge("a", "e")
     graph.add_an_edge("b", "c")
-    graph.add_an_edge("b", "d")
-    graph.add_an_edge("c", "a")
-    graph.add_an_edge("d", "c")
+    graph.add_an_edge("c", "d")
     graph.add_an_edge("d", "e")
-    graph.add_an_edge("f", "e")
-    graph.add_an_edge("g", "d")
-    graph.add_an_edge("g", "f")
+    graph.add_an_edge("e", "f")
+    graph.add_an_edge("f", "g")
     graph.add_an_edge("g", "h")
-    graph.add_an_edge("h", "f")
     
-    print(graph)
-    print(graph.depth_first_search("a"))
+    graph2.add_an_edge("a", "b")
+    graph2.add_an_edge("a", "e")
+    graph2.add_an_edge("b", "c")
+    graph2.add_an_edge("b", "d")
+    graph2.add_an_edge("c", "a")
+    graph2.add_an_edge("d", "c")
+    graph2.add_an_edge("d", "e")
+    graph2.add_an_edge("f", "e")
+    graph2.add_an_edge("g", "d")
+    graph2.add_an_edge("g", "f")
+    graph2.add_an_edge("g", "h")
+    graph2.add_an_edge("h", "f")
     
+    print(graph.is_bipartite())
+    print(graph2.is_bipartite())
+    
+    graph3.add_an_edge("a", "b")
+    graph3.add_an_edge("b", "c")
+    graph3.add_an_edge("c", "a")
+    print(graph3.is_bipartite())
