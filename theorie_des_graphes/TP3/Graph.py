@@ -15,10 +15,9 @@ class Graph:
         self.adjency_list = dict()
 
     def add_a_node(self, node_name):
-        """add a new node in the node set and refresh 
-                the adjency_list
+        """add a new node in the node set and refresh the adjency_list
                 node_name is a string which contain the new node 
-                comming into the graph
+        comming into the graph
         """
         if node_name in self.nodes:
             print("ce node est deja dans le graphe")
@@ -28,8 +27,8 @@ class Graph:
     
     def add_an_edge(self, from_node, to_node):
         """add en edge between from_node to the node to_node
-        from_node is a string which contain the parent node
-        to_node is a string which contain the link's child
+                from_node is a string which contain the parent node
+                to_node is a string which contain the link's child
         """
         if not(from_node in self.nodes)\
                     or not(to_node in self.nodes):
@@ -62,6 +61,14 @@ class Graph:
         "=========================\n"
 
     def breadth_first_search(self, departure):
+        """
+        return a dictionnary that have node as key and node as value 
+        the node in value is the parent of the node in the key
+        
+        use the fifo methode to determine which one is the next to look at.
+        
+            departure is the first starting point of the course
+        """
         colors = {}
         for node in self.nodes:
             colors[node] = "white"
@@ -77,13 +84,14 @@ class Graph:
             while fifo != []:
                 in_progress = fifo[0]
                 fifo.pop(0)
-                for neighbour in self.adjency_list[in_progress]:
+                for neighbour \
+                        in sorted(self.adjency_list[in_progress]):
                     if colors[neighbour] == "white":
                         parents[neighbour] = in_progress
                         colors[neighbour] = "grey"
                         fifo.append(neighbour)
                 colors[in_progress] = "black"
-                #do here what you want for the node in_progress
+                
                 
             
             if colors[node] != "white":
@@ -93,42 +101,92 @@ class Graph:
             fifo.append(node)
             
         return parents
+        
+        
+        
+        
+    def recursive(self,\
+                colors, \
+                lifo = [], \
+                departure = None, \
+                parents = {}):
+                
+        """
+         useful for depth_first_search to always look at the last
+         in and change the focus with every new neighbour found
+         
+         it allow to go to the next node and keep the current in another 
+         iteration
+        """
+                
+        if departure != None:
+            lifo = []
+            lifo.append(departure)
+            parents = {}
+            colors[departure] = "grey"
+            parents[departure] = None
+        departure = None
+        
+        if lifo != []:
+            in_progress = lifo[-1]
+            lifo.pop()
+            for neighbour \
+                    in sorted(self.adjency_list[in_progress]):
+                if colors[neighbour] == "white":
+                    parents[neighbour] = in_progress
+                    colors[neighbour] = "grey"
+                    lifo.append(neighbour)
+                    colors[in_progress] = "black"
+                    parents, colors = self.recursive(lifo = lifo, \
+                                            colors = colors, \
+                                            departure = None, \
+                                            parents = parents)
+                
+            if lifo == []:
+                return parents, colors
     
     def depth_first_search(self, departure):
-        colors = {}
+        """
+        return a dictionnary that have node as key and node as value 
+        the node in value is the parent of the node in the key
 
+        use the lifo methode to determine which one is the next to look at.
+
+            departure is the starting point of the course
+        """
+        colors = {}
+        parents_list = []
+        parents = {}
         for node in self.nodes:
             colors[node] = "white"
-            
-        parents = {}
-        lifo = []
-        lifo.append(departure)
-        colors[departure] = "grey"
-        parents[departure] = None
-        
+        in_queue, colors = self.recursive(colors = colors,\
+                                            departure = departure)
+        parents_list.append(in_queue)
         for node in sorted(self.nodes):
-
-            while lifo != []:
-                in_progress = lifo[-1]
-                lifo.pop()
-                for neighbour in self.adjency_list[in_progress]:
-                    if colors[neighbour] == "white":
-                        parents[neighbour] = in_progress
-                        colors[neighbour] = "grey"
-                        lifo.append(neighbour)
-                colors[in_progress] = "black"
-                #do here what you want for the node in_progress
-            
-            if colors[node] != "white":
+            if node in parents or colors[node] != "white":
                 continue
-            colors[node] = "grey"
-            parents[node] = None
-            lifo.append(node)
+            in_queue, colors = self.recursive(colors = colors,\
+                                                departure = node)
+            parents_list.append(in_queue)
             
+        for parents_ in parents_list:
+            for key in parents_:
+                parents[key] = parents_[key]
         return parents
         
     def is_bipartite(self):
-        parents = self.depth_first_search(sorted(list(self.nodes))[0])
+        """
+this methode attribut a colors at each node in the graph, 
+based on the parent/child combinaison given by the
+breadth_first_search methode it while give a different color to the
+child and the parent, if there is a problem in the attribution then
+the graph isn't bipartite, after that, if it succed,
+all the node have a color and we just have to test with the list of
+edges if they all have a different colors
+
+return True or False
+        """
+        parents = self.breadth_first_search(sorted(list(self.nodes))[0])
         
         
         colors = {}
@@ -160,46 +218,30 @@ class Graph:
             from_node, to_node = edge
             if colors[from_node] == colors[to_node]:
                 return False
+                
         return True
     
     
-    
-if __name__ == "__main__":
-    graph = Graph()
-    graph2 = Graph()
-    graph3 = Graph()
-    for i in range(ord("a"), ord("d")):
-        graph3.add_a_node(chr(i))
-    
-    for i in range(ord("a"), ord("i")):
-        graph.add_a_node(chr(i))
-        graph2.add_a_node(chr(i))
+    def articulation_point(self):
+        """
+        find every articulation point in a non-oriented graph,
+        with the simple algorythm that use the facts that this point
+        will have 2 sons or more in a depth course algorythm
+        so the method test every point and test if it has more than
+        2sons
         
-    graph.add_an_edge("a", "b")
-    graph.add_an_edge("b", "c")
-    graph.add_an_edge("c", "d")
-    graph.add_an_edge("d", "e")
-    graph.add_an_edge("e", "f")
-    graph.add_an_edge("f", "g")
-    graph.add_an_edge("g", "h")
+        return a list of node
+        """
+        articulation_point = []
+        for root in self.nodes:
+            course = self.depth_first_search(root)
+            if len([node for node in course.values() \
+                        if node == root]) >= 2:
+                articulation_point.append(root)
+        return articulation_point
+            
+            
+        
+        return articulation_point
     
-    graph2.add_an_edge("a", "b")
-    graph2.add_an_edge("a", "e")
-    graph2.add_an_edge("b", "c")
-    graph2.add_an_edge("b", "d")
-    graph2.add_an_edge("c", "a")
-    graph2.add_an_edge("d", "c")
-    graph2.add_an_edge("d", "e")
-    graph2.add_an_edge("f", "e")
-    graph2.add_an_edge("g", "d")
-    graph2.add_an_edge("g", "f")
-    graph2.add_an_edge("g", "h")
-    graph2.add_an_edge("h", "f")
-    
-    print(graph.is_bipartite())
-    print(graph2.is_bipartite())
-    
-    graph3.add_an_edge("a", "b")
-    graph3.add_an_edge("b", "c")
-    graph3.add_an_edge("c", "a")
-    print(graph3.is_bipartite())
+
