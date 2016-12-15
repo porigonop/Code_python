@@ -1,0 +1,35 @@
+raisonnement :
+
+on cherche le nombre de node pour n couple:
+on ne prend pas en compte la barque, elle multiplira le nombre par 2
+
+
+on va compter le nombre d'homme sur l'ile :
+si il n'y as que des femmes:
+on as 2^n possibilité de mouvement avec n nb de femmes
+
+pour 1 homme on as:
+
+2 mouvement possible :  l'homme part sans sa femme
+                        le couple part
+
+pour 2 home on as 
+4 mouvement possible :  l'un ou l'autre des couple part -> 2
+                        les 2 hommes partent 
+                        les 2 couples partent
+                        
+il semblerai qu'on ai 2^nb_homme possibilité de mouvement
+
+nb_homme    :   0       1       2       3       4       5       n
+possibilité :   2^n     2^1     2^2     2^3     2^4     2^5     2^n
+
+ainsi on aurait 2^n + sum k=1, k -> n (2^k) possibilité avec n couples
+
+soit 2^n + 2(1-2^n/1-2)
+soit 2^n + 2^n+1 - 2
+soit 3*2^n -2 possibilité
+
+on multiplie par 2 et c'est gagné ! 
+pour 2 couple on as 10 nodes
+pour 3 couple on as 22 nodes
+

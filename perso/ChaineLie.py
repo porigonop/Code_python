@@ -1,5 +1,5 @@
-﻿#!/usr/bin/env python3
-class Item():
+#!/usr/bin/env python3
+class Item:
 
     def __init__(self, item = None, next = None):
         self.item = item
@@ -16,7 +16,7 @@ class Item():
               
         return answer[:-2] + "]"
     
-class Liste():
+class Liste:
     
     def __init__(self, *element):
         A = Item(element[-1])
@@ -106,8 +106,7 @@ class Liste():
                 other_current = other_current.next
             other_current.item = value
             
-
-            
+     
     def __len__(self):
     
         count = 0
@@ -125,6 +124,8 @@ class Liste():
         
     def __repr__(self):
         return str(self.initial)
+        
+        
         
 if __name__ == "__main__":
     liste = Liste(1,3,2)
