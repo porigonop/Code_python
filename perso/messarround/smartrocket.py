@@ -11,34 +11,25 @@ radius = 1
 iteration = 0
 thrust = 0.1
 mutation_rate = 0.01
-scale = 5000000
-nb_rocket = 5002
-nb_obs = 300
-touch_target = 0.2
-touch_obs = 0.1
-FPS = 1000
-SCALE = 7
+scale = 5
+nb_rocket = 100
+nb_obs = 30
+touch_target = 1.2
+touch_obs = 0.3
+FPS = 60
+SCALE = 50
 
 nb_secteur = 10
 
-def delete_liste(lst1, lst2):
-    ln1 = len(lst1)
-    cp1 = list(lst1)
-    cp2 = list(lst2)
-    for elt in range(-1,-ln1 -1, -1):
-        item = lst1.pop(ln1 + elt)
-        if item in lst1:
-            cp1.pop(ln1 + elt)
-            cp2.pop(ln1 + elt)
-            lst2.pop(len(lst1) + elt)
-    ln2 = len(lst2)
-    for elt in range(-1,-ln2 -1, -1):
-        item = lst2.pop(ln2 + elt)
-        if item in lst1:
-            cp1.pop(ln2 + elt)
-            cp2.pop(ln2 + elt)
-    return cp1, cp2
 
+def constrain(value, from_value, to_value):
+    if value < from_value:
+        return from_value
+    elif value > to_value:
+        return to_value
+    else:
+        return value
+    
 def mapjs(value, min, max, newmin, newmax):
     return (value / (max - min))*(newmax-newmin)
 
@@ -46,11 +37,23 @@ def dist (rocket, target):
     return (rocket.x - target.x)**2 + (rocket.y - target.y)**2
 
 def collide(item, lst = []):
-    if item.x > WIDTH or item.x < 0 or item.y > HEIGHT + 100 or item.y < 0:
+    if item.x > WIDTH or item.x < 0 or item.y > HEIGHT or item.y < 0:
         return True
     elif list == []:
         return False
-        
+    for obs in obstacle:
+        if item.x < obs.x + obs.len and item.x > obs.x - obs.len \
+            and item.y < obs.y + obs.height and item.y > obs.y - obs.height:
+                if obs.col == '':
+                    obs.col = 'red'
+                    canvas.delete(obs.obs)
+                    obs.obs = canvas.create_rectangle(obs.x - obs.len,
+                                                       obs.y - obs.height,
+                                                       obs.x + obs.len,
+                                                       obs.y + obs.height,
+                                                       fill = obs.col)
+                return True
+    """
     for obs in secteurs[lst[0]][lst[1]]:
         if item.x < obs.x + obs.len and item.x > obs.x - obs.len \
             and item.y < obs.y + obs.height and item.y > obs.y - obs.height:
@@ -58,24 +61,22 @@ def collide(item, lst = []):
                 obs.col = 'red'
                 canvas.delete(obs.obs)
                 obs.obs = canvas.create_rectangle(obs.x - obs.len,
-                                                    obs.y - obs.height,
-                                                    obs.x + obs.len,
-                                                    obs.y + obs.height,
-                                                    fill = obs.col)
+                                                   obs.y - obs.height,
+                                                   obs.x + obs.len,
+                                                   obs.y + obs.height,
+                                                   fill = obs.col)
             return True
-
+    """
     return False
     
 def succed(rocket):
     dis = 1/dist(rocket, population.target)
-    if rocket.x > WIDTH or rocket.x < 0 or rocket.y > HEIGHT + 100 or rocket.y < 0:
-        dis *= 0.8 
     if rocket.crashed:
         dis *= touch_obs
     if rocket.goal:
         dis *= touch_target
         dis /= mapjs(rocket.iter, 0, nb, 0, 100) + 0.1
-    return int(dis * scale)
+    return dis * scale
         
 class Target():
     def __init__(self):
@@ -94,7 +95,8 @@ class Target():
         self.y = y
 
 x_rocket =  WIDTH / 2
-y_rocket = HEIGHT + 50
+y_rocket = HEIGHT
+
 class Rocket():
     
     def __init__(self, genes = False, mut = random.random() * 0.1):
@@ -118,10 +120,8 @@ class Rocket():
         self.iter = nb
         
     def move(self):
-        if self.y > HEIGHT:
-            pass
-        elif collide(self, [int(mapjs(self.x, 0, WIDTH, 0, nb_secteur-1)),\
-                        int(mapjs(self.y, 0, HEIGHT, 0, nb_secteur-1))]):
+        if collide(self, [int(mapjs(self.x, 0, WIDTH, 0, nb_secteur-1)),\
+                            int(mapjs(self.y, 0, HEIGHT, 0, nb_secteur-1))]):
             self.crashed = True
         if dist(self, population.target) < (10 + radius) **2 and not self.goal:
             self.goal = True
@@ -131,6 +131,7 @@ class Rocket():
             self.yspeed += self.genes[iteration][1] * thrust
             self.x += self.xspeed
             self.y += self.yspeed 
+            
         canvas.coords(self.rocket,\
                     self.x - radius,\
                     self.y - radius,\
@@ -181,13 +182,15 @@ class Population():
         
     def new_pop(self):
         breedingpool = []
-        for rocket in self.rockets:
-            
-            for i in range(succed(rocket)):
-                breedingpool.append(rocket)
+        score = []
+        for elt in range(len(self.rockets)):
+            score.append(succed(self.rockets[elt]))
+        max_score = max(score)
+        for elt in range(len(self.rockets)):
+            for i in range(int(mapjs(score[elt], 0, max_score, 0, 100))):
+                breedingpool.append(self.rockets[elt])
         np = []
         for i in range(nb_rocket):
-
             parentA = random.choice(breedingpool)
             parentB = random.choice(breedingpool)
             np.append(parentA.crossover(parentB))
@@ -196,7 +199,7 @@ class Population():
         self.rockets = np
         
 class Obstacle():
-    def __init__(self, x, y, len, height):
+    def __init__(self, x, y, len, height, color = "white"):
         self.x = x
         self.y = y 
         self.len = len
@@ -205,7 +208,8 @@ class Obstacle():
         self.obs = canvas.create_rectangle(self.x - self.len,
                                             self.y - self.height,
                                             self.x + self.len,
-                                            self.y + self.height)
+                                            self.y + self.height,
+                                            fill = color)
 
                                             
 nbr = 1/FPS                                            
@@ -222,64 +226,74 @@ def Draw():
                 
         if iteration % 10 ==1:
             tk.update()
-        #a = nbr - (time.time() - timeur )
-        #time.sleep(a if a>0 else 0)
+        a = nbr - (time.time() - timeur )
+        time.sleep(a if a>0 else 0)
 
 def pointeur(event):
     population.target.move(event.x, event.y)
 tk = Tk()
 decay = 5
 timeur = time.time()
-canvas = Canvas( tk, width = WIDTH, height = HEIGHT, background = "white")
+canvas = Canvas( tk, width = WIDTH, height = HEIGHT + 100, background = "white")
 population = Population()
 secteurs = []             
-obstacle = []               
+obstacle = []  
 for i in range(nb_secteur):
     secteurs.append([])
     for j in range(nb_secteur):
-        secteurs[i].append([])
+        secteurs[i].append([])             
+for i in range(nb_obs):#nb_secteur):
+    obstacle.append(Obstacle(random.random()*WIDTH,\
+                               random.random() * HEIGHT,\
+                               random.random() * SCALE,\
+                               random.random() * SCALE))
+"""
+    for j in range(nb_secteur):
         for k in range(int(nb_obs / nb_secteur ** 2)):
             pos_x = random.random() *   WIDTH / nb_secteur + WIDTH * i / nb_secteur
-            pos_y = random.random() *   HEIGHT / nb_secteur + HEIGHT * j/nb_secteur
+            pos_y = random.random() *   HEIGHT / nb_secteur + HEIGHT * j / nb_secteur
             lengh = random.random() *   SCALE
             height = random.random() *   SCALE
             
-            obstacle.append(Obstacle(pos_x,\
+            pos_x1 = constrain(pos_x - lengh,\
+                            WIDTH * i / nb_secteur,\
+                            WIDTH * i / nb_secteur + WIDTH / nb_secteur)
+            pos_y1 = constrain(pos_y - height,\
+                                HEIGHT * j / nb_secteur,\
+                                HEIGHT * j / nb_secteur+HEIGHT / nb_secteur) 
+            pos_x2 = constrain(pos_x + lengh,\
+                                WIDTH * i / nb_secteur, \
+                                WIDTH * i / nb_secteur + WIDTH / nb_secteur)
+            pos_y2 = constrain(pos_y + height,\
+                                HEIGHT * j / nb_secteur,\
+                                HEIGHT * j / nb_secteur+HEIGHT / nb_secteur)
+            lengh = pos_x2 - pos_x1
+            height = pos_y2 - pos_y1
+            pos_x = pos_x1 + lengh / 2
+            
+            pos_y = pos_y1 + height / 2
+
+            colx, coly = "00", "00"
+            if i % 2 == 1:
+                colx = "ff"
+            if j % 2 == 1:
+                coly = "ff"
+            color = "#" +\
+            colx+\
+            coly + \
+            "00"
+            
+            secteurs[i][j].append(Obstacle(pos_x,\
                                pos_y,\
-                               lengh,\
-                               height))
+                               lengh/2,\
+                               height/2))#,\
+                               #color))
             
-            
-for obs in obstacle:
-    x_al = []
-    y_al = []
-    
-    x1 = int(mapjs(obs.x - obs.len, 0 - SCALE, WIDTH + SCALE, 0, nb_secteur-1))
-    y1 = int(mapjs(obs.y - obs.height, 0 - SCALE, WIDTH + SCALE, 0, nb_secteur-1))
-    x_al.append(x1)
-    y_al.append(y1)
-    
-    x2 = int(mapjs(obs.x - obs.len, 0 - SCALE, WIDTH + SCALE, 0, nb_secteur-1))
-    y2 = int(mapjs(obs.y + obs.height, 0 - SCALE, WIDTH + SCALE, 0, nb_secteur-1))
-    x_al.append(x2)
-    y_al.append(y2)
-    
-    x3 = int(mapjs(obs.x + obs.len, 0 - SCALE, WIDTH + SCALE, 0, nb_secteur-1))
-    y3 = int(mapjs(obs.y + obs.height, 0 - SCALE, WIDTH + SCALE, 0, nb_secteur-1))
-    x_al.append(x3)
-    y_al.append(y3)
-    
-    x4 = int(mapjs(obs.x + obs.len, 0 - SCALE, WIDTH + SCALE, 0, nb_secteur-1))
-    y4 = int(mapjs(obs.y - obs.height, 0 - SCALE, WIDTH + SCALE, 0, nb_secteur-1))
-    x_al.append(x4)
-    y_al.append(y4)
-    
-    x_al, y_al = delete_liste(x_al, y_al)
-    for i in x_al:
-        for j in y_al:
-            secteurs[i][j].append(obs)
-    
-    
+        
+        canvas.create_line(WIDTH * i // nb_secteur, 0, WIDTH * i // nb_secteur, HEIGHT)
+        canvas.create_line(0, HEIGHT * j // nb_secteur, WIDTH, HEIGHT * j // nb_secteur)
+"""
+        
 canvas.bind("<Button-1>", pointeur)
 canvas.pack()
 Draw()

@@ -175,15 +175,15 @@ class Graph:
         
     def is_bipartite(self):
         """
-this methode attribut a colors at each node in the graph, 
-based on the parent/child combinaison given by the
-breadth_first_search methode it while give a different color to the
-child and the parent, if there is a problem in the attribution then
-the graph isn't bipartite, after that, if it succed,
-all the node have a color and we just have to test with the list of
-edges if they all have a different colors
+        this methode attribut a colors at each node in the graph, 
+        based on the parent/child combinaison given by the
+        breadth_first_search methode it while give a different color to the
+        child and the parent, if there is a problem in the attribution then
+        the graph isn't bipartite, after that, if it succed,
+        all the node have a color and we just have to test with the list of
+        edges if they all have a different colors
 
-return True or False
+        return True or False
         """
         parents = self.breadth_first_search(sorted(list(self.nodes))[0])
         
@@ -244,7 +244,7 @@ return True or False
     
     def is_non_oriented(self):
         """ return True if non oriented
-            return False i oriented
+            return False if oriented
          """
         for elt in self.edges:
             if not ((elt[1], elt[0]) in self.edges):
@@ -281,15 +281,20 @@ return True or False
         """
         return True if len(self.connected_component()) == 1 else False
         
+    def is_oriented(self):
+        """return True if the grpah is oriented
+        False if non oriented
+        """
+        return not self.is_non_oriented()
+        
+        
+    
+
 if __name__ == "__main__":
     graph = Graph()
     graph.add_a_node("A")
     graph.add_a_node("B")
     graph.add_a_node("C")    
-    graph.add_an_edge("A", "B")
-    graph.add_an_edge("B", "A")
-    graph.add_an_edge("A", "C")
-    graph.add_an_edge("C", "A")
     
     
-    print(graph.is_connected())
+    print(graph.connected_component())
