@@ -12,12 +12,13 @@ iteration = 0
 thrust = 0.1
 mutation_rate = 0.01
 scale = 5
-nb_rocket = 100
-nb_obs = 30
+nb_rocket = 1000
+nb_obs = 50
 touch_target = 1.2
 touch_obs = 0.3
-FPS = 60
-SCALE = 50
+FPS = 1
+
+SCALE = 25
 
 nb_secteur = 10
 
